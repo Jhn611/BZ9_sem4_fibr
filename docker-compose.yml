@@ -6,20 +6,37 @@ services:
     ports:
       - "3000:3000"  # Админ-сервер (REST API)
       - "8080:8080"  # Пользовательский сервер (GraphQL)
+      - "5555:5555"  # TCP-сервер
+      - "5556:5556"  # WebSocket-сервер
     volumes:
-      - ./backend/products.json:/app/products.json  # Сохраняем данные товаров
+      - ./backend/products.json:/app/products.json
     restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - TCP_PORT=5555
+      - WS_PORT=5556
+      - HTTP_PORT=8080
 
   frontend_admin:
     build: ./frontend_admin
     ports:
-      - "4000:80"    # Админ-панель
+      - "4000:80"
     depends_on:
       - backend
+    restart: unless-stopped
 
   frontend_user:
     build: ./frontend_user
     ports:
-      - "5000:80"    # Пользовательский интерфейс
+      - "5000:80"
     depends_on:
       - backend
+    restart: unless-stopped
+
+  frontend_tcp:
+    build: ./frontend_tcp
+    ports:
+      - "6001:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
